@@ -9,8 +9,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        bg: "#0a0a0c",
+        surface: "#141317",
+        surface2: "#1b1a20",
+        edge: "#26232c",
+        accent: {
+          DEFAULT: "#8b5cf6",
+          hover: "#9b6ef8",
+          deep: "#6d28d9",
+        },
+        rarity: {
+          consumer: "#b0b3b8",
+          industrial: "#3b82f6",
+          restricted: "#a855f7",
+          classified: "#ec4899",
+          covert: "#ef4444",
+        },
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        heading: ["var(--font-rajdhani)", "system-ui", "sans-serif"],
       },
     },
   },

@@ -1,0 +1,18 @@
+export const botNames = [
+  "NakedOnTheBeach",
+  "ScrapLord",
+  "HeliEnjoyer",
+  "RoofCamper42",
+  "BradleyBully",
+  "ZergLeader",
+  "SulfurAddict",
+  "DoorCamper",
+  "RecoilScript(NOT)",
+  "OilRigOleg",
+  "ChadThunderRock",
+  "PipeShotPete",
+  "WipeDayWarrior",
+  "FlipFlopFrank",
+  "CopterCarl",
+  "TurretTina",
+];
