@@ -300,13 +300,16 @@ export default function JackpotClient() {
                 style={{ backgroundColor: p.color + "33" }}
               >
                 <span
-                  className="flex h-8 w-8 items-center justify-center rounded-full font-heading text-sm font-bold text-white"
+                  className="flex h-7 w-7 items-center justify-center rounded-full font-heading text-sm font-bold text-white"
                   style={{ backgroundColor: p.color }}
                 >
                   {p.name[0]}
                 </span>
-                <p className="mt-1 w-20 truncate text-center text-[10px] text-zinc-300">
+                <p className="mt-0.5 w-20 truncate text-center text-[10px] text-zinc-300">
                   {p.name}
+                </p>
+                <p className="text-[10px] font-semibold tabular-nums text-zinc-500">
+                  {formatCoins(value(p.items))}
                 </p>
               </div>
             ))}
@@ -350,9 +353,11 @@ export default function JackpotClient() {
                   <div className="flex items-center justify-between">
                     <p className="flex items-center gap-2 text-sm font-semibold">
                       <span
-                        className="h-2.5 w-2.5 rounded-full"
+                        className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white"
                         style={{ backgroundColor: p.color }}
-                      />
+                      >
+                        {p.name[0]}
+                      </span>
                       {p.name}
                     </p>
                     <p className="text-xs tabular-nums text-zinc-400">

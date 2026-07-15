@@ -40,6 +40,7 @@ export default function CaseOpener({ caseDef }: { caseDef: CaseDef }) {
   const [spin, setSpin] = useState<SpinState | null>(null);
   const [spinning, setSpinning] = useState(false);
   const [won, setWon] = useState<{ skin: Skin; uid: string } | null>(null);
+  const [sessionDrops, setSessionDrops] = useState<Skin[]>([]);
   const [error, setError] = useState("");
 
   const odds = caseOdds(caseDef);
@@ -81,6 +82,7 @@ export default function CaseOpener({ caseDef }: { caseDef: CaseDef }) {
       detail: `${caseDef.name} → ${spin.winner.name}`,
     });
     setWon({ skin: spin.winner, uid: item.uid });
+    setSessionDrops((d) => [spin.winner, ...d].slice(0, 12));
     setSpinning(false);
     sounds.reveal(spin.winner.rarity);
   }
@@ -167,6 +169,18 @@ export default function CaseOpener({ caseDef }: { caseDef: CaseDef }) {
           </span>
         </button>
         {error && <p className="text-sm text-rarity-covert">{error}</p>}
+        {sessionDrops.length > 0 && (
+          <div className="ml-auto flex items-center gap-1.5 rounded-xl border border-edge bg-surface px-3 py-1.5">
+            <span className="mr-1 text-[10px] uppercase text-zinc-500">
+              Session drops
+            </span>
+            {sessionDrops.slice(0, 8).map((s, i) => (
+              <span key={i} title={`${s.name} (${formatCoins(s.price)})`}>
+                <SteamImage src={s.image} alt={s.name} size={26} />
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Win reveal */}

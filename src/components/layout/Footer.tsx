@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 
 export default function Footer() {
   return (
@@ -6,10 +7,8 @@ export default function Footer() {
       {/* right padding keeps links clear of the floating chat button */}
       <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:pr-28">
         <div>
-          <p className="font-heading text-lg font-bold">
-            <span className="text-accent">RUST</span>FIGHT
-          </p>
-          <p className="mt-1 max-w-md text-xs text-zinc-500">
+          <Logo />
+          <p className="mt-2 max-w-md text-xs text-zinc-500">
             Demo project for portfolio purposes. All balances, items and games
             are simulated — no real money, skins, or trades are involved. 18+.
           </p>

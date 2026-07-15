@@ -1,8 +1,8 @@
 "use client";
 
-import { ShieldAlert } from "lucide-react";
 import { useUserStore } from "@/store/useUserStore";
 import { useMounted } from "@/lib/useMounted";
+import Logo from "@/components/Logo";
 
 export default function AgeGateModal() {
   const mounted = useMounted();
@@ -14,7 +14,9 @@ export default function AgeGateModal() {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 p-4">
       <div className="w-full max-w-md rounded-xl border border-edge bg-surface p-6 text-center">
-        <ShieldAlert className="mx-auto text-accent" size={36} />
+        <div className="flex justify-center">
+          <Logo markOnly size="lg" />
+        </div>
         <h2 className="mt-3 font-heading text-2xl font-bold uppercase">
           18+ only
         </h2>

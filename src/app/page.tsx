@@ -7,6 +7,7 @@ import { formatCoins } from "@/lib/format";
 import SteamImage from "@/components/SteamImage";
 import LiveDrops from "@/components/LiveDrops";
 import CaseArt from "@/components/CaseArt";
+import Logo from "@/components/Logo";
 
 const gameDescriptions: Record<string, string> = {
   "/cases": "Open themed cases and unbox Rust skins",
@@ -40,8 +41,8 @@ export default function HomePage() {
       {/* hero with skin collage */}
       <section className="mt-6 flex items-center justify-between gap-6 overflow-hidden rounded-xl border border-edge bg-surface p-8 sm:p-12">
         <div className="max-w-xl">
-          <h1 className="font-heading text-5xl font-bold sm:text-6xl">
-            <span className="text-accent">RUST</span>FIGHT
+          <h1>
+            <Logo size="lg" />
           </h1>
           <p className="mt-4 text-lg text-zinc-400">
             Open cases, battle other players and upgrade your Rust skins. This

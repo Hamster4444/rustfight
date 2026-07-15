@@ -52,6 +52,14 @@ export default function UpgraderClient() {
     );
   }
 
+  function quickPick(mult: number) {
+    if (spinning || selectedValue <= 0) return;
+    sounds.click();
+    setOutcome(null);
+    const goal = selectedValue * mult;
+    setTarget(targets.find((s) => s.price >= goal) ?? targets[targets.length - 1]);
+  }
+
   function upgrade() {
     if (!target || selectedItems.length === 0 || chance <= 0 || spinning)
       return;
@@ -147,8 +155,8 @@ export default function UpgraderClient() {
         </div>
 
         {/* wheel */}
-        <div className="flex flex-col items-center justify-center rounded-xl border border-edge bg-surface p-6 lg:w-72">
-          <div className="relative h-44 w-44">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-edge bg-surface p-6 lg:w-80">
+          <div className="relative h-52 w-52">
             <svg viewBox="0 0 160 160" className="h-full w-full -rotate-90">
               <circle
                 cx="80"
@@ -183,6 +191,20 @@ export default function UpgraderClient() {
               </p>
               <p className="text-[10px] uppercase text-zinc-500">win chance</p>
             </div>
+          </div>
+
+          {/* quick multiplier target picks */}
+          <div className="mt-4 flex gap-2">
+            {[1.5, 2, 5, 10].map((m) => (
+              <button
+                key={m}
+                onClick={() => quickPick(m)}
+                disabled={spinning || selectedValue <= 0}
+                className="rounded-lg border border-edge bg-surface2 px-3 py-1.5 text-xs font-semibold text-zinc-400 transition-colors hover:border-accent hover:text-zinc-100 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {m}x
+              </button>
+            ))}
           </div>
 
           {target && selectedValue > 0 && (

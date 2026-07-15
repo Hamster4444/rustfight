@@ -133,6 +133,22 @@ export default function MinesClient() {
               className="mt-1 w-full rounded-xl border border-edge bg-bg px-3 py-2.5 text-sm text-zinc-100 outline-none focus:border-accent disabled:opacity-50"
             />
           </label>
+          <div className="mt-2 flex gap-2">
+            {(["½", "2×", "100", "500"] as const).map((label) => (
+              <button
+                key={label}
+                disabled={phase === "playing"}
+                onClick={() => {
+                  if (label === "½") setBetInput(String(Math.max(1, Math.floor(bet / 2))));
+                  else if (label === "2×") setBetInput(String(Math.round(bet * 2)));
+                  else setBetInput(label);
+                }}
+                className="flex-1 rounded-lg border border-edge bg-surface2 px-2 py-1.5 text-xs font-semibold text-zinc-400 transition-colors hover:border-accent hover:text-zinc-100 disabled:opacity-40"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <label className="mt-4 block text-xs uppercase text-zinc-500">
             Mines: <span className="font-bold text-zinc-100">{mineCount}</span>
             <input
@@ -145,6 +161,22 @@ export default function MinesClient() {
               className="mt-2 w-full accent-[#8b5cf6]"
             />
           </label>
+          <div className="mt-1.5 flex gap-2">
+            {[1, 3, 5, 10, 24].map((n) => (
+              <button
+                key={n}
+                disabled={phase === "playing"}
+                onClick={() => setMineCount(n)}
+                className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-semibold transition-colors disabled:opacity-40 ${
+                  mineCount === n
+                    ? "border-accent bg-accent-deep/20 text-zinc-100"
+                    : "border-edge bg-surface2 text-zinc-400 hover:border-accent hover:text-zinc-100"
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
 
           <div className="mt-4 rounded-xl border border-edge bg-surface2 p-3 text-sm">
             <div className="flex justify-between">

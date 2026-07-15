@@ -17,7 +17,11 @@ export type CaseIcon =
   | "footprints"
   | "ruler"
   | "gem"
-  | "recycle";
+  | "recycle"
+  | "skull"
+  | "zap"
+  | "flame"
+  | "swords";
 
 export interface CaseDef {
   id: string;
@@ -128,6 +132,38 @@ export const cases: CaseDef[] = [
     "#9ca3af",
     "recycle",
     skins.filter((s) => s.price <= 1.5)
+  ),
+  makeCase(
+    "blackout",
+    "Blackout",
+    "All-black everything",
+    "#71717a",
+    "skull",
+    match(/black/i)
+  ),
+  makeCase(
+    "neon-nights",
+    "Neon Nights",
+    "Glowing paint and loud colors",
+    "#f472b6",
+    "zap",
+    match(/neon|popstar|heat seeker|doodle/i)
+  ),
+  makeCase(
+    "the-furnace",
+    "The Furnace",
+    "Solid mid-tier drops, no fillers",
+    "#fb923c",
+    "flame",
+    skins.filter((s) => s.price >= 1.5 && s.price <= 3.5)
+  ),
+  makeCase(
+    "wipe-day",
+    "Wipe Day",
+    "Every skin on the site in one box",
+    "#10b981",
+    "swords",
+    skins
   ),
 ];
 

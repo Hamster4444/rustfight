@@ -1,12 +1,16 @@
 import {
   Crosshair,
   DoorClosed,
+  Flame,
   Footprints,
   Gem,
   Recycle,
   Ruler,
   Shield,
   Shirt,
+  Skull,
+  Swords,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 import type { CaseDef, CaseIcon } from "@/data/cases";
@@ -21,6 +25,10 @@ const caseIcons: Record<CaseIcon, LucideIcon> = {
   ruler: Ruler,
   gem: Gem,
   recycle: Recycle,
+  skull: Skull,
+  zap: Zap,
+  flame: Flame,
+  swords: Swords,
 };
 
 interface CaseArtProps {

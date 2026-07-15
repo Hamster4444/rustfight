@@ -19,7 +19,7 @@ export default function CasesPage() {
         Pick a case, spin the reel, keep what you unbox.
       </p>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {cases.map((c) => {
           const topItems = [...c.pool]
             .sort((a, b) => b.skin.price - a.skin.price)

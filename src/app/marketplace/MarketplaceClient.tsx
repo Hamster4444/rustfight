@@ -238,8 +238,16 @@ export default function MarketplaceClient() {
         </p>
       )}
 
+      <p className="mt-4 text-xs text-zinc-500">
+        Showing{" "}
+        <span className="font-semibold text-zinc-300">
+          {tab === "buy" ? buyList.length : mounted ? sellList.length : 0}
+        </span>{" "}
+        {tab === "buy" ? "skins for sale" : "items from your inventory"}
+      </p>
+
       {/* listing */}
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {tab === "buy" &&
           buyList.map((s) => (
             <div key={s.id} className="flex flex-col items-center gap-2">

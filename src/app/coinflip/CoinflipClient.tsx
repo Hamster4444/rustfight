@@ -158,18 +158,38 @@ export default function CoinflipClient() {
         <div className="rounded-xl border border-edge bg-surface p-5">
           {flip && phase !== "idle" ? (
             <div className="flex flex-col items-center py-4">
-              <p className="text-sm text-zinc-400">
-                <span className="font-semibold text-zinc-100">You</span> (
-                {flip.yourSide}) vs{" "}
-                <span className="font-semibold text-zinc-100">
-                  {flip.opponent}
-                </span>{" "}
-                ({other(flip.yourSide)})
-              </p>
-              <p className="mt-1 flex items-center gap-1 text-sm font-bold">
-                <Coins size={14} className="text-accent" />
-                Pot: {formatCoins(flip.bet * 2)}
-              </p>
+              <div className="flex w-full items-center justify-between px-2 sm:px-8">
+                <div className="flex flex-col items-center gap-1">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-accent/60 bg-surface2">
+                    <User size={20} className="text-accent" />
+                  </span>
+                  <p className="text-sm font-semibold">You</p>
+                  <p className="flex items-center gap-1 text-xs capitalize text-zinc-500">
+                    <SideBadge side={flip.yourSide} small /> {flip.yourSide}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <p className="font-heading text-2xl font-bold text-zinc-600">
+                    VS
+                  </p>
+                  <p className="mt-1 flex items-center gap-1 rounded-lg bg-surface2 px-3 py-1 text-sm font-bold tabular-nums">
+                    <Coins size={13} className="text-accent" />
+                    {formatCoins(flip.bet * 2)}
+                  </p>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-edge bg-surface2">
+                    <User size={20} className="text-zinc-500" />
+                  </span>
+                  <p className="max-w-28 truncate text-sm font-semibold">
+                    {flip.opponent}
+                  </p>
+                  <p className="flex items-center gap-1 text-xs capitalize text-zinc-500">
+                    <SideBadge side={other(flip.yourSide)} small />{" "}
+                    {other(flip.yourSide)}
+                  </p>
+                </div>
+              </div>
 
               <div className="my-10 h-44 w-44" style={{ perspective: 800 }}>
                 {phase === "waiting" ? (
@@ -245,15 +265,21 @@ export default function CoinflipClient() {
                 {(["purple", "black"] as Side[]).map((s) => (
                   <button
                     key={s}
-                    onClick={() => setSide(s)}
-                    className={`flex flex-1 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold capitalize transition-colors ${
+                    onClick={() => {
+                      sounds.click();
+                      setSide(s);
+                    }}
+                    className={`flex flex-1 flex-col items-center gap-2 rounded-xl border px-4 py-4 transition-colors ${
                       side === s
-                        ? "border-accent bg-accent-deep/20 text-zinc-100"
-                        : "border-edge bg-surface2 text-zinc-400 hover:text-zinc-100"
+                        ? "border-accent bg-accent-deep/20"
+                        : "border-edge bg-surface2 hover:border-accent/50"
                     }`}
                   >
-                    <SideBadge side={s} small />
-                    {s}
+                    <SideBadge side={s} />
+                    <span className="text-sm font-semibold capitalize text-zinc-100">
+                      {s}
+                    </span>
+                    <span className="text-xs text-zinc-500">50.00%</span>
                   </button>
                 ))}
               </div>

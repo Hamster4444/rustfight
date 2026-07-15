@@ -9,6 +9,7 @@ import { useUserStore } from "@/store/useUserStore";
 import { useMounted } from "@/lib/useMounted";
 import { formatCoins } from "@/lib/format";
 import { sounds } from "@/lib/sounds";
+import Logo from "@/components/Logo";
 import { gameNav, otherNav } from "./navItems";
 
 function BalanceChip() {
@@ -105,9 +106,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <span className="font-heading text-xl font-bold text-accent">
-            RUSTFIGHT
-          </span>
+          <Logo />
           <button onClick={onClose} className="p-1 text-zinc-400">
             <X size={20} />
           </button>
@@ -150,9 +149,8 @@ export default function TopBar() {
       >
         <Menu size={18} />
       </button>
-      <Link href="/" className="font-heading text-2xl font-bold tracking-wide">
-        <span className="text-accent">RUST</span>
-        <span className="text-zinc-100">FIGHT</span>
+      <Link href="/">
+        <Logo responsive />
       </Link>
       <span className="hidden md:inline rounded-md border border-edge bg-surface2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
         Demo — no real money
