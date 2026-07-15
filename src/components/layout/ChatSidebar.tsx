@@ -7,6 +7,7 @@ import { cannedChat } from "@/data/chatMessages";
 import { randomOf } from "@/lib/rng";
 import { useUserStore } from "@/store/useUserStore";
 import { useMounted } from "@/lib/useMounted";
+import { sounds } from "@/lib/sounds";
 
 interface ChatMsg {
   id: number;
@@ -56,6 +57,7 @@ export default function ChatSidebar() {
     setMessages((ms) =>
       [...ms, { id: msgId++, author: username, text, isYou: true }].slice(-40)
     );
+    sounds.click();
     setInput("");
   }
 

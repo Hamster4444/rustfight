@@ -7,12 +7,26 @@ export interface CasePoolEntry {
   weight: number;
 }
 
+// string key, not a component — CaseDef must stay serializable so server
+// pages can pass it to client components
+export type CaseIcon =
+  | "crosshair"
+  | "shield"
+  | "shirt"
+  | "door"
+  | "footprints"
+  | "ruler"
+  | "gem"
+  | "recycle";
+
 export interface CaseDef {
   id: string;
   name: string;
   tagline: string;
   price: number;
   image: string; // flagship skin image used as case art
+  color: string; // case identity color (hex)
+  icon: CaseIcon;
   pool: CasePoolEntry[];
 }
 
@@ -33,6 +47,8 @@ function makeCase(
   id: string,
   name: string,
   tagline: string,
+  color: string,
+  icon: CaseIcon,
   pool: Skin[],
   flagship?: Skin
 ): CaseDef {
@@ -45,7 +61,7 @@ function makeCase(
   // price the case ~11% above expected value (house edge)
   const price = Math.max(0.25, Math.round(ev * 1.11 * 100) / 100);
   const top = flagship ?? [...pool].sort((a, b) => b.price - a.price)[0];
-  return { id, name, tagline, price, image: top.image, pool: entries };
+  return { id, name, tagline, price, image: top.image, color, icon, pool: entries };
 }
 
 export const cases: CaseDef[] = [
@@ -53,43 +69,64 @@ export const cases: CaseDef[] = [
     "ak-arsenal",
     "AK Arsenal",
     "Assault rifle skins only",
+    "#ef4444",
+    "crosshair",
     match(/AK-?47/i)
   ),
   makeCase(
     "face-off",
     "Face Off",
     "Metal facemasks for the front line",
+    "#94a3b8",
+    "shield",
     match(/Facemask/i)
   ),
   makeCase(
     "streetwear",
     "Streetwear",
     "Hoodies straight from the compound",
+    "#38bdf8",
+    "shirt",
     match(/Hoodie/i)
   ),
   makeCase(
     "fort-knox",
     "Fort Knox",
     "Doors to keep the raiders out",
+    "#f59e0b",
+    "door",
     match(/Door/i)
   ),
   makeCase(
     "boots-on-ground",
     "Boots on the Ground",
     "Footwear for every wipe",
+    "#84cc16",
+    "footprints",
     match(/Boots/i)
   ),
-  makeCase("leg-day", "Leg Day", "Pants with personality", match(/Pants/i)),
+  makeCase(
+    "leg-day",
+    "Leg Day",
+    "Pants with personality",
+    "#2dd4bf",
+    "ruler",
+    match(/Pants/i)
+  ),
   makeCase(
     "high-roller",
     "High Roller",
     "Only the most expensive loot",
+    "#a855f7",
+    "gem",
     skins.filter((s) => s.price >= 3)
   ),
   makeCase(
     "scrap-bucket",
     "Scrap Bucket",
     "Cheap thrills for new survivors",
+    "#9ca3af",
+    "recycle",
     skins.filter((s) => s.price <= 1.5)
   ),
 ];

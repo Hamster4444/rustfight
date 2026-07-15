@@ -65,6 +65,7 @@ export default function UpgraderClient() {
     const landing = win
       ? Math.random() * (arcDeg - 6) + 3
       : arcDeg + Math.random() * (360 - arcDeg - 6) + 3;
+    sounds.spinStart();
     setRotation((r) => r + 1440 + (360 - (r % 360)) + landing);
     setSpinning(true);
   }

@@ -59,6 +59,7 @@ export default function MinesClient() {
     while (set.size < mineCount) {
       set.add(Math.floor(Math.random() * GRID));
     }
+    sounds.click();
     setMines(set);
     setRevealed(new Set());
     setBustTile(null);
@@ -70,7 +71,7 @@ export default function MinesClient() {
     if (mines.has(i)) {
       setBustTile(i);
       setPhase("busted");
-      sounds.lose();
+      sounds.boom();
       addRecord({
         game: "Mines",
         wager: bet,
@@ -79,7 +80,7 @@ export default function MinesClient() {
       });
       return;
     }
-    sounds.tick();
+    sounds.gem();
     const next = new Set(revealed);
     next.add(i);
     setRevealed(next);
@@ -93,7 +94,7 @@ export default function MinesClient() {
     const mult = multiplierFor(mineCount, revealedCount);
     const win = Math.round(bet * mult * 100) / 100;
     addBalance(win);
-    sounds.win();
+    sounds.cashout();
     addRecord({
       game: "Mines",
       wager: bet,

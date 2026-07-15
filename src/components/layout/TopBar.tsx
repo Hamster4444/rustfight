@@ -8,6 +8,7 @@ import { Coins, LogOut, Menu, Plus, User, Volume2, VolumeX, X } from "lucide-rea
 import { useUserStore } from "@/store/useUserStore";
 import { useMounted } from "@/lib/useMounted";
 import { formatCoins } from "@/lib/format";
+import { sounds } from "@/lib/sounds";
 import { gameNav, otherNav } from "./navItems";
 
 function BalanceChip() {
@@ -21,7 +22,10 @@ function BalanceChip() {
         {mounted ? formatCoins(balance) : "—"}
       </span>
       <button
-        onClick={() => addBalance(1000)}
+        onClick={() => {
+          addBalance(1000);
+          sounds.coin();
+        }}
         title="Add 1,000 demo coins"
         className="ml-1 rounded-lg bg-accent p-1.5 text-white transition-colors hover:bg-accent-hover"
       >

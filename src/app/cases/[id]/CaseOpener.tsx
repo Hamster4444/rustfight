@@ -13,6 +13,7 @@ import { useMounted } from "@/lib/useMounted";
 import { sounds } from "@/lib/sounds";
 import SkinCard, { rarityText } from "@/components/SkinCard";
 import SteamImage from "@/components/SteamImage";
+import CaseArt from "@/components/CaseArt";
 
 const REEL_SIZE = 60;
 const WIN_INDEX = 52;
@@ -35,6 +36,7 @@ export default function CaseOpener({ caseDef }: { caseDef: CaseDef }) {
   const addRecord = useUserStore((s) => s.addRecord);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastTickIdx = useRef(0);
   const [spin, setSpin] = useState<SpinState | null>(null);
   const [spinning, setSpinning] = useState(false);
   const [won, setWon] = useState<{ skin: Skin; uid: string } | null>(null);
@@ -63,6 +65,8 @@ export default function CaseOpener({ caseDef }: { caseDef: CaseDef }) {
     const offset =
       8 + WIN_INDEX * CARD_PITCH + 72 - containerWidth / 2 + jitter;
 
+    lastTickIdx.current = 0;
+    sounds.spinStart();
     setSpinning(true);
     setSpin({ reel, offset, winner, key: Date.now() });
   }
@@ -78,8 +82,7 @@ export default function CaseOpener({ caseDef }: { caseDef: CaseDef }) {
     });
     setWon({ skin: spin.winner, uid: item.uid });
     setSpinning(false);
-    if (spin.winner.price >= caseDef.price) sounds.win();
-    else sounds.lose();
+    sounds.reveal(spin.winner.rarity);
   }
 
   function sellWon() {
@@ -99,12 +102,15 @@ export default function CaseOpener({ caseDef }: { caseDef: CaseDef }) {
       </Link>
 
       <div className="mt-4 flex items-center gap-4">
-        <SteamImage src={caseDef.image} alt={caseDef.name} size={72} />
+        <CaseArt caseDef={caseDef} size={110} />
         <div>
           <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">
             {caseDef.name}
           </h1>
           <p className="text-sm text-zinc-500">{caseDef.tagline}</p>
+          <p className="mt-1 text-xs text-zinc-600">
+            {caseDef.pool.length} items in this case
+          </p>
         </div>
       </div>
 
@@ -125,6 +131,14 @@ export default function CaseOpener({ caseDef }: { caseDef: CaseDef }) {
             initial={{ x: 0 }}
             animate={{ x: -spin.offset }}
             transition={{ duration: 5.5, ease: [0.15, 0.85, 0.25, 1] }}
+            onUpdate={(latest) => {
+              if (typeof latest.x !== "number") return;
+              const idx = Math.floor(-latest.x / CARD_PITCH);
+              if (idx !== lastTickIdx.current) {
+                lastTickIdx.current = idx;
+                sounds.tick();
+              }
+            }}
             onAnimationComplete={onSpinDone}
           >
             {spin.reel.map((skin, i) => (

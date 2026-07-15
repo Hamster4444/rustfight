@@ -8,6 +8,7 @@ import type { Rarity, Skin } from "@/lib/types";
 import { formatCoins } from "@/lib/format";
 import { useUserStore } from "@/store/useUserStore";
 import { useMounted } from "@/lib/useMounted";
+import { sounds } from "@/lib/sounds";
 import SkinCard from "@/components/SkinCard";
 
 const SELL_RATE = 0.95; // you get 95% of value when selling
@@ -116,6 +117,7 @@ export default function MarketplaceClient() {
       return;
     }
     addSkins([skin]);
+    sounds.click();
     setMessage(`Bought ${skin.name} for ${formatCoins(skin.price)} coins.`);
   }
 
@@ -123,6 +125,7 @@ export default function MarketplaceClient() {
     const payout = Math.round(skin.price * SELL_RATE * 100) / 100;
     removeItems([uidStr]);
     addBalance(payout);
+    sounds.coin();
     setMessage(`Sold ${skin.name} for ${formatCoins(payout)} coins.`);
   }
 

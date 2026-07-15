@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Coins, Minus, Plus, Swords, Trophy, User, X } from "lucide-react";
+import { Coins, Crown, Minus, Plus, Swords, User, X } from "lucide-react";
 import { cases, pickFromCase, type CaseDef } from "@/data/cases";
 import { botNames } from "@/data/bots";
 import type { Skin } from "@/lib/types";
@@ -12,6 +12,7 @@ import { useUserStore } from "@/store/useUserStore";
 import { useMounted } from "@/lib/useMounted";
 import { sounds } from "@/lib/sounds";
 import SteamImage from "@/components/SteamImage";
+import CaseArt from "@/components/CaseArt";
 import { rarityText } from "@/components/SkinCard";
 
 type Mode = "1v1" | "2v2";
@@ -39,6 +40,14 @@ interface OpenLobby {
   cost: number;
 }
 
+const REEL_LEN = 22;
+const REEL_WIN = 18;
+const ITEM_H = 64; // px per reel row
+const REEL_H = 128; // visible reel window
+const SPIN_MS = 2200;
+const REVEAL_MS = 2400;
+const ROUND_MS = 4000;
+
 function sum(skins: Skin[]): number {
   return Math.round(skins.reduce((s, k) => s + k.price, 0) * 100) / 100;
 }
@@ -62,45 +71,64 @@ function buildBattle(mode: Mode, rounds: CaseDef[], creatorBot?: string): Battle
   return { mode, rounds, players, drops, cost };
 }
 
-/** Cycles through case skins while hidden, pops the real drop when revealed. */
-function SlotReveal({
+/** Vertical reel that decelerates onto the drawn item, like the case opener. */
+function VerticalReel({
   caseDef,
   result,
-  revealed,
+  spinKey,
+  withSound,
 }: {
   caseDef: CaseDef;
   result: Skin;
-  revealed: boolean;
+  spinKey: number;
+  withSound: boolean;
 }) {
-  const [cycleIdx, setCycleIdx] = useState(0);
-  useEffect(() => {
-    if (revealed) return;
-    const t = setInterval(() => setCycleIdx((i) => i + 1), 110);
-    return () => clearInterval(t);
-  }, [revealed]);
+  const reel = useMemo(() => {
+    const r = Array.from({ length: REEL_LEN }, () => pickFromCase(caseDef));
+    r[REEL_WIN] = result;
+    return r;
+    // regenerate only when a new spin starts
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spinKey]);
+  const lastIdx = useRef(0);
+  // land the winning row centered in the window
+  const offset = REEL_WIN * ITEM_H + ITEM_H / 2 - REEL_H / 2;
 
-  if (!revealed) {
-    const skin = caseDef.pool[cycleIdx % caseDef.pool.length].skin;
-    return (
-      <div className="flex h-24 w-24 items-center justify-center opacity-50">
-        <SteamImage src={skin.image} alt={skin.name} size={72} />
-      </div>
-    );
-  }
   return (
-    <motion.div
-      initial={{ scale: 0.6, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      className="flex h-24 w-24 flex-col items-center justify-center"
+    <div
+      className="relative w-full overflow-hidden rounded-xl border border-edge bg-bg/60"
+      style={{ height: REEL_H }}
     >
-      <SteamImage src={result.image} alt={result.name} size={64} />
-      <p className={`w-24 truncate text-center text-[10px] ${rarityText[result.rarity]}`}>
-        {result.name}
-      </p>
-      <p className="text-[10px] font-semibold text-zinc-300">
-        {formatCoins(result.price)}
-      </p>
-    </motion.div>
+      <div
+        className="pointer-events-none absolute inset-x-0 top-1/2 z-10 -translate-y-1/2 border-y border-accent/40"
+        style={{ height: ITEM_H }}
+      />
+      <motion.div
+        key={spinKey}
+        className="absolute inset-x-0 top-0"
+        initial={{ y: 0 }}
+        animate={{ y: -offset }}
+        transition={{ duration: SPIN_MS / 1000, ease: [0.15, 0.85, 0.25, 1] }}
+        onUpdate={(latest) => {
+          if (!withSound || typeof latest.y !== "number") return;
+          const idx = Math.floor(-latest.y / ITEM_H);
+          if (idx !== lastIdx.current) {
+            lastIdx.current = idx;
+            sounds.tick();
+          }
+        }}
+      >
+        {reel.map((s, i) => (
+          <div
+            key={i}
+            className="flex items-center justify-center"
+            style={{ height: ITEM_H }}
+          >
+            <SteamImage src={s.image} alt={s.name} size={52} />
+          </div>
+        ))}
+      </motion.div>
+    </div>
   );
 }
 
@@ -118,6 +146,7 @@ export default function BattlesClient() {
   const [roundIdx, setRoundIdx] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [result, setResult] = useState<"win" | "lose" | "tie" | null>(null);
+  const [winnerTeam, setWinnerTeam] = useState<0 | 1 | null>(null);
   const [error, setError] = useState("");
   const awarded = useRef(false);
 
@@ -168,10 +197,12 @@ export default function BattlesClient() {
     }
     setError("");
     awarded.current = false;
+    sounds.spinStart();
     setBattle(buildBattle(mode, rounds, creatorBot));
     setRoundIdx(0);
     setRevealed(false);
     setResult(null);
+    setWinnerTeam(null);
     setPhase("playing");
   }
 
@@ -196,14 +227,17 @@ export default function BattlesClient() {
         addSkins(allItems);
         profit = sum(allItems) - battle.cost;
         setResult("win");
+        setWinnerTeam(0);
         sounds.win();
       } else if (t0 === t1) {
         addSkins(myItems);
         profit = sum(myItems) - battle.cost;
         setResult("tie");
+        setWinnerTeam(null);
       } else {
         profit = -battle.cost;
         setResult("lose");
+        setWinnerTeam(1);
         sounds.lose();
       }
       addRecord({
@@ -216,8 +250,8 @@ export default function BattlesClient() {
       return;
     }
     setRevealed(false);
-    const t1 = setTimeout(() => setRevealed(true), 1600);
-    const t2 = setTimeout(() => setRoundIdx((i) => i + 1), 3000);
+    const t1 = setTimeout(() => setRevealed(true), REVEAL_MS);
+    const t2 = setTimeout(() => setRoundIdx((i) => i + 1), ROUND_MS);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -230,61 +264,145 @@ export default function BattlesClient() {
   if (phase !== "setup" && battle) {
     const currentCase =
       battle.rounds[Math.min(roundIdx, battle.rounds.length - 1)];
+    const potSoFar = sum(
+      battle.players.flatMap((_, i) => revealedRounds(battle.drops[i]))
+    );
     const teamOf = (t: 0 | 1) =>
       battle.players.map((p, i) => ({ p, i })).filter(({ p }) => p.team === t);
     return (
       <div className="mx-auto max-w-6xl">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">
             <Swords className="mr-2 inline text-accent" size={26} />
             {battle.mode} Battle
           </h1>
-          <p className="text-sm text-zinc-400">
-            Round{" "}
-            <span className="font-semibold text-zinc-100">
-              {Math.min(roundIdx + 1, battle.rounds.length)}/{battle.rounds.length}
-            </span>{" "}
-            — {currentCase.name}
-          </p>
+          <div className="flex items-center gap-4">
+            {/* round progress dots */}
+            <div className="flex items-center gap-1.5">
+              {battle.rounds.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-2.5 w-2.5 rounded-full ${
+                    i < roundIdx
+                      ? "bg-accent"
+                      : i === roundIdx && phase === "playing"
+                        ? "border border-accent bg-accent/40"
+                        : "bg-edge"
+                  }`}
+                />
+              ))}
+            </div>
+            <span className="flex items-center gap-1 rounded-xl border border-edge bg-surface px-3 py-1.5 text-sm font-bold tabular-nums">
+              <Coins size={14} className="text-accent" />
+              {formatCoins(potSoFar)}
+              <span className="ml-1 text-[10px] font-normal uppercase text-zinc-500">
+                pot
+              </span>
+            </span>
+          </div>
         </div>
 
-        <div className={`mt-6 grid gap-4 ${battle.mode === "1v1" ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"}`}>
+        {/* current round */}
+        {phase === "playing" && roundIdx < battle.rounds.length && (
+          <div className="mt-3 flex items-center gap-3 rounded-xl border border-edge bg-surface px-4 py-2.5">
+            <CaseArt caseDef={currentCase} size={44} detail={false} />
+            <p className="text-sm text-zinc-400">
+              Round{" "}
+              <span className="font-semibold text-zinc-100">
+                {roundIdx + 1}/{battle.rounds.length}
+              </span>{" "}
+              — opening{" "}
+              <span className="font-semibold" style={{ color: currentCase.color }}>
+                {currentCase.name}
+              </span>
+            </p>
+          </div>
+        )}
+
+        <div className={`mt-4 grid gap-4 ${battle.mode === "1v1" ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"}`}>
           {battle.players.map((p, i) => {
             const shown = revealedRounds(battle.drops[i]);
+            const lastDrop = shown[shown.length - 1];
+            const isWinner = phase === "done" && winnerTeam === p.team;
             return (
               <div
                 key={i}
                 className={`rounded-xl border p-4 ${
-                  p.isYou ? "border-accent/60 bg-accent-deep/10" : "border-edge bg-surface"
+                  isWinner
+                    ? "border-accent bg-accent-deep/15"
+                    : p.isYou
+                      ? "border-accent/60 bg-accent-deep/10"
+                      : "border-edge bg-surface"
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <p className="flex items-center gap-2 text-sm font-semibold">
-                    <User size={14} className={p.isYou ? "text-accent" : "text-zinc-500"} />
+                    {isWinner ? (
+                      <Crown size={15} className="text-accent" />
+                    ) : (
+                      <User
+                        size={14}
+                        className={p.isYou ? "text-accent" : "text-zinc-500"}
+                      />
+                    )}
                     {p.name}
                   </p>
                   <span className="text-[10px] uppercase text-zinc-500">
                     Team {p.team + 1}
                   </span>
                 </div>
-                <div className="mt-3 flex min-h-24 items-center justify-center">
+
+                <div className="mt-3">
                   {phase === "playing" && roundIdx < battle.rounds.length ? (
-                    <SlotReveal
-                      caseDef={currentCase}
-                      result={battle.drops[i][roundIdx]}
-                      revealed={revealed}
-                    />
+                    <>
+                      <VerticalReel
+                        caseDef={currentCase}
+                        result={battle.drops[i][roundIdx]}
+                        spinKey={roundIdx}
+                        withSound={p.isYou}
+                      />
+                      <div className="mt-1.5 h-8 text-center">
+                        {revealed && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                          >
+                            <p
+                              className={`truncate text-[11px] ${rarityText[battle.drops[i][roundIdx].rarity]}`}
+                            >
+                              {battle.drops[i][roundIdx].name}
+                            </p>
+                            <p className="text-[11px] font-semibold text-zinc-300">
+                              {formatCoins(battle.drops[i][roundIdx].price)}
+                            </p>
+                          </motion.div>
+                        )}
+                      </div>
+                    </>
                   ) : (
-                    <p className="text-xs text-zinc-500">Battle over</p>
+                    <div
+                      className="flex flex-col items-center justify-center rounded-xl border border-edge bg-bg/60"
+                      style={{ height: REEL_H + 38 }}
+                    >
+                      {lastDrop && (
+                        <SteamImage
+                          src={lastDrop.image}
+                          alt={lastDrop.name}
+                          size={56}
+                        />
+                      )}
+                      <p className="mt-1 text-xs text-zinc-500">Battle over</p>
+                    </div>
                   )}
                 </div>
+
                 <p className="mt-2 flex items-center justify-center gap-1 border-t border-edge pt-2 text-sm font-bold tabular-nums">
                   <Coins size={13} className="text-accent" />
                   {formatCoins(sum(shown))}
                 </p>
-                <div className="mt-2 flex flex-wrap justify-center gap-1">
+                <div className="mt-2 flex min-h-7 flex-wrap justify-center gap-1">
                   {shown.map((s, j) => (
-                    <SteamImage key={j} src={s.image} alt={s.name} size={28} />
+                    <SteamImage key={j} src={s.image} alt={s.name} size={26} />
                   ))}
                 </div>
               </div>
@@ -298,7 +416,7 @@ export default function BattlesClient() {
             animate={{ opacity: 1, y: 0 }}
             className="mt-6 rounded-xl border border-edge bg-surface p-6 text-center"
           >
-            <Trophy
+            <Crown
               size={32}
               className={`mx-auto ${result === "win" ? "text-accent" : "text-zinc-600"}`}
             />
@@ -327,8 +445,18 @@ export default function BattlesClient() {
         {/* team totals */}
         <div className="mt-6 grid grid-cols-2 gap-4">
           {([0, 1] as const).map((t) => (
-            <div key={t} className="rounded-xl border border-edge bg-surface p-3 text-center">
-              <p className="text-xs uppercase text-zinc-500">
+            <div
+              key={t}
+              className={`rounded-xl border p-3 text-center ${
+                phase === "done" && winnerTeam === t
+                  ? "border-accent bg-accent-deep/15"
+                  : "border-edge bg-surface"
+              }`}
+            >
+              <p className="flex items-center justify-center gap-1.5 text-xs uppercase text-zinc-500">
+                {phase === "done" && winnerTeam === t && (
+                  <Crown size={12} className="text-accent" />
+                )}
                 Team {t + 1} {teamOf(t).some(({ p }) => p.isYou) && "(you)"}
               </p>
               <p className="mt-1 flex items-center justify-center gap-1 font-heading text-xl font-bold tabular-nums">
@@ -366,7 +494,10 @@ export default function BattlesClient() {
               {(["1v1", "2v2"] as Mode[]).map((m) => (
                 <button
                   key={m}
-                  onClick={() => setMode(m)}
+                  onClick={() => {
+                    sounds.click();
+                    setMode(m);
+                  }}
                   className={`rounded-xl px-4 py-1.5 text-sm font-semibold transition-colors ${
                     mode === m
                       ? "bg-accent text-white"
@@ -389,7 +520,7 @@ export default function BattlesClient() {
                     n > 0 ? "border-accent/60 bg-accent-deep/10" : "border-edge bg-surface2"
                   }`}
                 >
-                  <SteamImage src={c.image} alt={c.name} size={56} />
+                  <CaseArt caseDef={c} size={64} detail={false} />
                   <p className="mt-1 w-full truncate text-center text-xs font-semibold">
                     {c.name}
                   </p>
@@ -457,9 +588,9 @@ export default function BattlesClient() {
                     {l.mode}
                   </span>
                 </div>
-                <div className="mt-2 flex items-center gap-1">
+                <div className="mt-2 flex items-center gap-1.5">
                   {l.rounds.map((c, i) => (
-                    <SteamImage key={i} src={c.image} alt={c.name} size={28} />
+                    <CaseArt key={i} caseDef={c} size={36} detail={false} />
                   ))}
                   <span className="ml-1 text-[11px] text-zinc-500">
                     {l.rounds.length} round{l.rounds.length === 1 ? "" : "s"}

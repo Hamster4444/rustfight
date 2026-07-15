@@ -67,6 +67,7 @@ export default function JackpotClient() {
   const reelRef = useRef<HTMLDivElement>(null);
   const settled = useRef(false);
   const roundId = useRef(1);
+  const lastTickIdx = useRef(0);
 
   const pot = value(participants.flatMap((p) => p.items));
   const you = participants.find((p) => p.isYou);
@@ -139,6 +140,8 @@ export default function JackpotClient() {
     setOffset(8 + WIN_INDEX * ENTRY_PITCH + 48 - width / 2 + (Math.random() - 0.5) * 60);
     setWinner(win);
     settled.current = false;
+    lastTickIdx.current = 0;
+    sounds.spinStart();
     setPhase("spinning");
   }, [participants]);
 
@@ -280,6 +283,14 @@ export default function JackpotClient() {
             initial={{ x: 0 }}
             animate={{ x: -offset }}
             transition={{ duration: 5, ease: [0.15, 0.85, 0.25, 1] }}
+            onUpdate={(latest) => {
+              if (typeof latest.x !== "number") return;
+              const idx = Math.floor(-latest.x / ENTRY_PITCH);
+              if (idx !== lastTickIdx.current) {
+                lastTickIdx.current = idx;
+                sounds.tick();
+              }
+            }}
             onAnimationComplete={onSpinDone}
           >
             {reel.map((p, i) => (

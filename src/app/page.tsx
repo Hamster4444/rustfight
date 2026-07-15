@@ -6,6 +6,7 @@ import { cases } from "@/data/cases";
 import { formatCoins } from "@/lib/format";
 import SteamImage from "@/components/SteamImage";
 import LiveDrops from "@/components/LiveDrops";
+import CaseArt from "@/components/CaseArt";
 
 const gameDescriptions: Record<string, string> = {
   "/cases": "Open themed cases and unbox Rust skins",
@@ -158,11 +159,8 @@ export default function HomePage() {
             href={`/cases/${c.id}`}
             className="group flex flex-col items-center rounded-xl border border-edge bg-surface p-4 transition-colors hover:border-accent"
           >
-            <SteamImage src={c.image} alt={c.name} size={72} />
-            <p className="mt-2 w-full truncate text-center text-xs font-semibold group-hover:text-accent">
-              {c.name}
-            </p>
-            <p className="flex items-center gap-1 text-[11px] text-zinc-500">
+            <CaseArt caseDef={c} size={104} />
+            <p className="mt-2 flex items-center gap-1 text-[11px] text-zinc-500 group-hover:text-accent">
               <Coins size={10} className="text-accent" />
               {formatCoins(c.price)}
             </p>

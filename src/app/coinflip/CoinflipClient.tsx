@@ -109,7 +109,10 @@ export default function CoinflipClient() {
   // waiting → flipping after opponent "joins"
   useEffect(() => {
     if (phase !== "waiting") return;
-    const t = setTimeout(() => setPhase("flipping"), 1400);
+    const t = setTimeout(() => {
+      sounds.spinStart();
+      setPhase("flipping");
+    }, 1400);
     return () => clearTimeout(t);
   }, [phase]);
 
