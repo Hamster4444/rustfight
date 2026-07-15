@@ -75,9 +75,9 @@ function SteamButton() {
   return (
     <button
       onClick={signIn}
-      className="rounded-xl bg-accent px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+      className="whitespace-nowrap rounded-xl bg-accent px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
     >
-      Sign in with Steam
+      <span className="hidden md:inline">Sign in with </span>Steam
     </button>
   );
 }
@@ -138,7 +138,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
 export default function TopBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-edge bg-surface px-4">
+    <header className="sticky top-0 z-40 flex h-16 items-center gap-2 border-b border-edge bg-surface px-3 sm:gap-3 sm:px-4">
       <button
         onClick={() => setMenuOpen(true)}
         className="rounded-xl border border-edge bg-surface2 p-2 text-zinc-300 lg:hidden"
@@ -153,7 +153,7 @@ export default function TopBar() {
       <span className="hidden md:inline rounded-md border border-edge bg-surface2 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
         Demo — no real money
       </span>
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ml-auto flex items-center gap-2 sm:gap-3">
         <BalanceChip />
         <SoundToggle />
         <SteamButton />

@@ -136,7 +136,7 @@ export default function JackpotClient() {
     strip[WIN_INDEX] = win;
     const width = reelRef.current?.clientWidth ?? 700;
     setReel(strip);
-    setOffset(WIN_INDEX * ENTRY_PITCH + 48 - width / 2 + (Math.random() - 0.5) * 60);
+    setOffset(8 + WIN_INDEX * ENTRY_PITCH + 48 - width / 2 + (Math.random() - 0.5) * 60);
     setWinner(win);
     settled.current = false;
     setPhase("spinning");
@@ -264,7 +264,9 @@ export default function JackpotClient() {
         ref={reelRef}
         className="relative mt-4 h-28 overflow-hidden rounded-xl border border-edge bg-surface"
       >
-        <div className="absolute left-1/2 top-0 z-10 h-full w-0.5 -translate-x-1/2 bg-accent" />
+        {phase !== "open" && (
+          <div className="absolute left-1/2 top-0 z-10 h-full w-0.5 -translate-x-1/2 bg-accent" />
+        )}
         {phase === "open" ? (
           <div className="flex h-full items-center justify-center gap-2 text-sm text-zinc-500">
             {participants.length < 2
@@ -273,7 +275,8 @@ export default function JackpotClient() {
           </div>
         ) : (
           <motion.div
-            className="absolute top-1/2 flex -translate-y-1/2 gap-2 pl-2"
+            className="absolute top-1/2 flex gap-2 pl-2"
+            style={{ y: "-50%" }}
             initial={{ x: 0 }}
             animate={{ x: -offset }}
             transition={{ duration: 5, ease: [0.15, 0.85, 0.25, 1] }}

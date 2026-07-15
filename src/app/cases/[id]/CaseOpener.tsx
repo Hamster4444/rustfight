@@ -59,8 +59,9 @@ export default function CaseOpener({ caseDef }: { caseDef: CaseDef }) {
 
     const containerWidth = containerRef.current?.clientWidth ?? 800;
     const jitter = (Math.random() - 0.5) * 90;
+    // 8 = strip left padding; center of winner card must end up under the marker
     const offset =
-      WIN_INDEX * CARD_PITCH + 72 - containerWidth / 2 + jitter;
+      8 + WIN_INDEX * CARD_PITCH + 72 - containerWidth / 2 + jitter;
 
     setSpinning(true);
     setSpin({ reel, offset, winner, key: Date.now() });
@@ -112,12 +113,15 @@ export default function CaseOpener({ caseDef }: { caseDef: CaseDef }) {
         ref={containerRef}
         className="relative mt-6 h-52 overflow-hidden rounded-xl border border-edge bg-surface"
       >
-        {/* center marker */}
-        <div className="absolute left-1/2 top-0 z-10 h-full w-0.5 -translate-x-1/2 bg-accent" />
+        {/* center marker — only while a spin is on screen */}
+        {spin && (
+          <div className="absolute left-1/2 top-0 z-10 h-full w-0.5 -translate-x-1/2 bg-accent" />
+        )}
         {spin ? (
           <motion.div
             key={spin.key}
-            className="absolute top-1/2 flex -translate-y-1/2 gap-2 pl-2"
+            className="absolute top-1/2 flex gap-2 pl-2"
+            style={{ y: "-50%" }}
             initial={{ x: 0 }}
             animate={{ x: -spin.offset }}
             transition={{ duration: 5.5, ease: [0.15, 0.85, 0.25, 1] }}

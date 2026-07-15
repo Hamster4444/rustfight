@@ -2,8 +2,9 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-edge bg-surface px-6 py-8">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <footer className="border-t border-edge bg-surface px-6 py-8 pb-20 sm:pb-8">
+      {/* right padding keeps links clear of the floating chat button */}
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:pr-28">
         <div>
           <p className="font-heading text-lg font-bold">
             <span className="text-accent">RUST</span>FIGHT
