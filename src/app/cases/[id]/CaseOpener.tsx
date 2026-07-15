@@ -90,7 +90,7 @@ export default function CaseOpener({ caseDef }: { caseDef: CaseDef }) {
   }
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-6xl">
       <Link
         href="/cases"
         className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-accent"
@@ -111,7 +111,7 @@ export default function CaseOpener({ caseDef }: { caseDef: CaseDef }) {
       {/* Spinner */}
       <div
         ref={containerRef}
-        className="relative mt-6 h-52 overflow-hidden rounded-xl border border-edge bg-surface"
+        className="relative mt-6 h-60 overflow-hidden rounded-xl border border-edge bg-surface"
       >
         {/* center marker — only while a spin is on screen */}
         {spin && (
@@ -213,7 +213,7 @@ export default function CaseOpener({ caseDef }: { caseDef: CaseDef }) {
       <h2 className="mt-10 font-heading text-xl font-bold uppercase tracking-wide">
         Case contents
       </h2>
-      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
+      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
         {odds.map(({ skin, chance }) => (
           <div key={skin.id} className="flex flex-col items-center gap-1">
             <SkinCard skin={skin} size="sm" />

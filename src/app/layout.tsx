@@ -35,7 +35,7 @@ export default function RootLayout({
         <TopBar />
         <div className="flex">
           <Sidebar />
-          <div className="flex min-h-[calc(100vh-4rem)] flex-1 flex-col">
+          <div className="flex min-h-[calc(100vh-4rem)] min-w-0 flex-1 flex-col">
             <main className="flex-1 px-4 py-6 sm:px-6">{children}</main>
             <Footer />
           </div>

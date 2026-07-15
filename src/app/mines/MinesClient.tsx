@@ -106,7 +106,7 @@ export default function MinesClient() {
   const gameOver = phase === "busted" || phase === "cashed";
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-6xl">
       <div className="flex items-center gap-3">
         <Bomb className="text-accent" size={28} />
         <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">
@@ -164,6 +164,29 @@ export default function MinesClient() {
             </div>
           </div>
 
+          {/* payout ladder for the current settings */}
+          <div className="mt-4 rounded-xl border border-edge bg-surface2 p-3">
+            <p className="text-xs uppercase text-zinc-500">Payout ladder</p>
+            <div className="mt-2 grid grid-cols-3 gap-1.5">
+              {Array.from({ length: 6 }, (_, i) => {
+                const tiles = revealed.size + i + 1;
+                if (tiles > GRID - mineCount) return null;
+                const mult = multiplierFor(mineCount, tiles);
+                return (
+                  <div
+                    key={tiles}
+                    className="rounded-lg bg-bg px-2 py-1.5 text-center"
+                  >
+                    <p className="text-[10px] text-zinc-500">{tiles} tiles</p>
+                    <p className="text-xs font-bold tabular-nums text-accent">
+                      {mult.toFixed(2)}x
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {phase === "playing" ? (
             <button
               onClick={() => doCashout()}
@@ -196,8 +219,8 @@ export default function MinesClient() {
         </div>
 
         {/* grid */}
-        <div className="rounded-xl border border-edge bg-surface p-4">
-          <div className="mx-auto grid max-w-md grid-cols-5 gap-2">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-edge bg-surface p-4 sm:p-6">
+          <div className="grid w-full max-w-xl grid-cols-5 gap-2.5">
             {Array.from({ length: GRID }, (_, i) => {
               const isMine = mines.has(i);
               const isRevealed = revealed.has(i);
@@ -218,12 +241,14 @@ export default function MinesClient() {
                         ? "border-accent/60 bg-accent-deep/25"
                         : showSafe
                           ? "border-edge bg-surface2 opacity-50"
-                          : "border-edge bg-surface2 hover:border-accent/50"
+                          : `border-edge bg-surface2 ${
+                              phase === "playing" ? "hover:border-accent/50" : ""
+                            }`
                   } disabled:cursor-default`}
                 >
                   {showMine && (
                     <Bomb
-                      size={22}
+                      size={28}
                       className={
                         i === bustTile ? "text-rarity-covert" : "text-zinc-500"
                       }
@@ -235,7 +260,7 @@ export default function MinesClient() {
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", stiffness: 400, damping: 20 }}
                     >
-                      <Gem size={22} className="text-accent" />
+                      <Gem size={28} className="text-accent" />
                     </motion.span>
                   )}
                 </motion.button>

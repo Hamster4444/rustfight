@@ -8,7 +8,7 @@ export const metadata = { title: "Cases — RustFight" };
 
 export default function CasesPage() {
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-7xl">
       <div className="flex items-center gap-3">
         <Package className="text-accent" size={28} />
         <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">
@@ -26,8 +26,8 @@ export default function CasesPage() {
             href={`/cases/${c.id}`}
             className="group flex flex-col items-center rounded-xl border border-edge bg-surface p-5 transition-colors hover:border-accent"
           >
-            <SteamImage src={c.image} alt={c.name} size={110} />
-            <p className="mt-3 font-heading text-lg font-bold group-hover:text-accent">
+            <SteamImage src={c.image} alt={c.name} size={140} />
+            <p className="mt-3 font-heading text-xl font-bold group-hover:text-accent">
               {c.name}
             </p>
             <p className="text-center text-xs text-zinc-500">{c.tagline}</p>

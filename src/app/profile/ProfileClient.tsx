@@ -41,7 +41,7 @@ export default function ProfileClient() {
   ];
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-7xl">
       <div className="flex items-center gap-3">
         <span className="flex h-12 w-12 items-center justify-center rounded-full border border-edge bg-surface2">
           <User size={22} className="text-accent" />

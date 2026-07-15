@@ -127,7 +127,7 @@ export default function MarketplaceClient() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-7xl">
       <div className="flex items-center gap-3">
         <Store className="text-accent" size={28} />
         <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">

@@ -61,14 +61,25 @@ export default function CoinflipClient() {
   const settled = useRef(false);
 
   const [lobbies, setLobbies] = useState<Lobby[]>([]);
+  const [recent, setRecent] = useState<
+    { id: number; winner: string; side: Side; pot: number }[]
+  >([]);
   useEffect(() => {
     if (!mounted) return;
     setLobbies(
-      Array.from({ length: 5 }, (_, i) => ({
+      Array.from({ length: 6 }, (_, i) => ({
         id: i,
         creator: randomOf(botNames),
         side: Math.random() < 0.5 ? "purple" : "black",
         bet: Math.round((25 + Math.random() * 975) * 100) / 100,
+      }))
+    );
+    setRecent(
+      Array.from({ length: 6 }, (_, i) => ({
+        id: i,
+        winner: randomOf(botNames),
+        side: (Math.random() < 0.5 ? "purple" : "black") as Side,
+        pot: Math.round((50 + Math.random() * 1950) * 100) / 100,
       }))
     );
   }, [mounted]);
@@ -128,7 +139,7 @@ export default function CoinflipClient() {
     : 0;
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-6xl">
       <div className="flex items-center gap-3">
         <CircleDollarSign className="text-accent" size={28} />
         <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">
@@ -157,12 +168,12 @@ export default function CoinflipClient() {
                 Pot: {formatCoins(flip.bet * 2)}
               </p>
 
-              <div className="my-8 h-32 w-32" style={{ perspective: 600 }}>
+              <div className="my-10 h-44 w-44" style={{ perspective: 800 }}>
                 {phase === "waiting" ? (
                   <motion.div
                     animate={{ scale: [1, 1.06, 1] }}
                     transition={{ repeat: Infinity, duration: 1 }}
-                    className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-edge bg-surface2 text-xs text-zinc-500"
+                    className="flex h-44 w-44 items-center justify-center rounded-full border-4 border-edge bg-surface2 text-sm text-zinc-500"
                   >
                     waiting…
                   </motion.div>
@@ -173,17 +184,17 @@ export default function CoinflipClient() {
                     animate={{ rotateY: finalRotation }}
                     transition={{ duration: 3, ease: [0.2, 0.7, 0.3, 1] }}
                     onAnimationComplete={onFlipDone}
-                    className="relative h-32 w-32"
+                    className="relative h-44 w-44"
                     style={{ transformStyle: "preserve-3d" }}
                   >
                     <div
-                      className="absolute inset-0 flex items-center justify-center rounded-full border-4 border-accent-deep bg-accent font-heading text-lg font-bold text-white"
+                      className="absolute inset-0 flex items-center justify-center rounded-full border-4 border-accent-deep bg-accent font-heading text-2xl font-bold text-white"
                       style={{ backfaceVisibility: "hidden" }}
                     >
                       PURPLE
                     </div>
                     <div
-                      className="absolute inset-0 flex items-center justify-center rounded-full border-4 border-edge bg-bg font-heading text-lg font-bold text-zinc-300"
+                      className="absolute inset-0 flex items-center justify-center rounded-full border-4 border-edge bg-bg font-heading text-2xl font-bold text-zinc-300"
                       style={{
                         backfaceVisibility: "hidden",
                         transform: "rotateY(180deg)",
@@ -275,6 +286,28 @@ export default function CoinflipClient() {
               {error && (
                 <p className="mt-2 text-sm text-rarity-covert">{error}</p>
               )}
+
+              {/* recent flips fill the panel */}
+              <h3 className="mt-6 border-t border-edge pt-4 font-heading text-sm font-bold uppercase tracking-widest text-zinc-500">
+                Recent flips
+              </h3>
+              <div className="mt-2 flex flex-col gap-1.5">
+                {recent.map((r) => (
+                  <div
+                    key={r.id}
+                    className="flex items-center justify-between rounded-lg bg-surface2 px-3 py-2 text-xs"
+                  >
+                    <span className="flex items-center gap-2 text-zinc-300">
+                      <SideBadge side={r.side} small />
+                      {r.winner} won
+                    </span>
+                    <span className="flex items-center gap-1 font-semibold tabular-nums">
+                      <Coins size={11} className="text-accent" />
+                      {formatCoins(r.pot)}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </>
           )}
         </div>

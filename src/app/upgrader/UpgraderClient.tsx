@@ -94,7 +94,7 @@ export default function UpgraderClient() {
   const arc = chance * 360;
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-7xl">
       <div className="flex items-center gap-3">
         <TrendingUp className="text-accent" size={28} />
         <h1 className="font-heading text-3xl font-bold uppercase tracking-wide">
@@ -115,7 +115,7 @@ export default function UpgraderClient() {
               ({formatCoins(selectedValue)} selected)
             </span>
           </h2>
-          <div className="mt-3 grid max-h-96 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
+          <div className="mt-3 grid max-h-[30rem] grid-cols-2 justify-items-center gap-2 overflow-y-auto sm:grid-cols-3 xl:grid-cols-4">
             {!mounted ? (
               <p className="col-span-full text-sm text-zinc-500">Loading…</p>
             ) : inventory.length === 0 ? (
@@ -219,7 +219,7 @@ export default function UpgraderClient() {
           <h2 className="font-heading text-lg font-bold uppercase">
             Target skin
           </h2>
-          <div className="mt-3 grid max-h-96 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
+          <div className="mt-3 grid max-h-[30rem] grid-cols-2 justify-items-center gap-2 overflow-y-auto sm:grid-cols-3 xl:grid-cols-4">
             {targets.map((s) => (
               <SkinCard
                 key={s.id}
